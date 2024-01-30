@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # third party
+    'rest_framework',
     'debug_toolbar',
 
     # local
@@ -150,4 +151,9 @@ mimetypes.add_type("application/javascript", ".js", True)
 
 DEBUG_TOOLBAR_CONFIG = {
     "INTERCEPT_REDIRECTS": False,
+}
+
+# Rest framework settings
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
 }
