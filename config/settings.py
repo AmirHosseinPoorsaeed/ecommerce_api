@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     # local
     'core.apps.CoreConfig',
+    'store.apps.StoreConfig',
 ]
 
 MIDDLEWARE = [
