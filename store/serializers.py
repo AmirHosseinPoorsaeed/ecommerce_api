@@ -3,7 +3,24 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from .models import Product
+from .models import Product, Category
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    number_of_products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ['id', 'title', 'description', 'number_of_products']
+
+    def validate(self, data):
+        if len(data['title']) < 6:
+            raise serializers.ValidationError(
+                'Category title should be at least 6.')
+        return data
+    
+    def get_number_of_products(self, category):
+        return category.products.count()
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -11,6 +28,7 @@ class ProductSerializer(serializers.ModelSerializer):
         max_digits=6, decimal_places=2, source='unit_price'
     )
     price_aftre_tax = serializers.SerializerMethodField()
+    category = CategorySerializer()
 
     class Meta:
         model = Product
