@@ -4,12 +4,14 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from .models import Category, Comment, Product
+from .serializers import CategorySerializer, CommentSerializer, ProductSerializer
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.select_related('category').all()
+    queryset = Product.objects.prefetch_related(
+        'comments'
+    ).select_related('category').all()
     serializer_class = ProductSerializer
 
     def destroy(self, request, pk):
@@ -40,3 +42,17 @@ class CategoryViewSet(ModelViewSet):
             )
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentViewSet(ModelViewSet):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        product_id = self.kwargs['product_pk']
+        return Comment.objects.filter(product_id=product_id)
+
+    def get_serializer_context(self):
+        return {
+            'product_pk': self.kwargs['product_pk'],
+            'user_pk': self.request.user.id
+        }
