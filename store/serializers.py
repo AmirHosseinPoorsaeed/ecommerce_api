@@ -28,7 +28,10 @@ class ProductSerializer(serializers.ModelSerializer):
         max_digits=6, decimal_places=2, source='unit_price'
     )
     price_aftre_tax = serializers.SerializerMethodField()
-    category = CategorySerializer()
+    category = serializers.HyperlinkedRelatedField(
+        view_name='category-detail',
+        queryset=Category.objects.all()
+    )
 
     class Meta:
         model = Product
