@@ -6,8 +6,19 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
 
-from .models import Cart, CartItem, Category, Comment, Product
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, ProductSerializer, UpdateCartItemSerializer
+from .models import Cart, CartItem, Category, Comment, Order, OrderItem, Product
+from .serializers import \
+    AddCartItemSerializer, \
+    CartItemSerializer, \
+    CartSerializer, \
+    CategorySerializer, \
+    CommentSerializer, \
+    OrderCreateSerializer, \
+    OrderForAdminSerializer, \
+    OrderSerializer, \
+    ProductSerializer, \
+    UpdateCartItemSerializer, \
+    UpdateOrderSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -82,10 +93,54 @@ class CartItemViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'cart_pk': self.kwargs['cart_pk']}
-    
+
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return AddCartItemSerializer
         elif self.request.method == 'PATCH':
             return UpdateCartItemSerializer
         return CartItemSerializer
+
+
+class OrderViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', 'options', 'head', ]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Order.objects.prefetch_related(
+            Prefetch(
+                'items',
+                queryset=OrderItem.objects.select_related('product').all()
+            )
+        ).select_related('customer__user').all()
+
+        if user.is_staff:
+            return queryset
+
+        return queryset.filter(customer__user_id=user.id)
+
+    def get_serializer_class(self):
+        user = self.request.user
+        if self.request.method == 'POST':
+            return OrderCreateSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
+
+        if user.is_staff:
+            return OrderForAdminSerializer
+        return OrderSerializer
+
+    def get_serializer_context(self):
+        return {
+            'user_pk': self.request.user.id
+        }
+
+    def create(self, request):
+        create_order_serializer = OrderCreateSerializer(
+            data=request.data,
+            context={'user_pk': self.request.user.id}
+        )
+        create_order_serializer.is_valid(raise_exception=True)
+        order = create_order_serializer.save()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
