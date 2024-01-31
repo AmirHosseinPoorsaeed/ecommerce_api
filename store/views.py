@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
 
 from .models import Cart, CartItem, Category, Comment, Product
-from .serializers import CartSerializer, CategorySerializer, CommentSerializer, ProductSerializer
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CommentSerializer, ProductSerializer, UpdateCartItemSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -71,3 +71,21 @@ class CartViewSet(CreateModelMixin,
         )
     ).all()
     serializer_class = CartSerializer
+
+
+class CartItemViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', ]
+
+    def get_queryset(self):
+        cart_id = self.kwargs['cart_pk']
+        return CartItem.objects.select_related('product').filter(cart_id=cart_id)
+
+    def get_serializer_context(self):
+        return {'cart_pk': self.kwargs['cart_pk']}
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddCartItemSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCartItemSerializer
+        return CartItemSerializer
