@@ -5,7 +5,11 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
+from rest_framework.filters import SearchFilter, OrderingFilter
 
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .filters import ProductFilter
 from .paginations import CustomPagination
 from .models import Cart, CartItem, Category, Comment, Order, OrderItem, Product
 from .serializers import \
@@ -28,6 +32,10 @@ class ProductViewSet(ModelViewSet):
     ).select_related('category').all()
     serializer_class = ProductSerializer
     pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProductFilter
+    search_fields = ['title', 'category__title', ]
+    ordering_fields = ['unit_price', 'inventory', ]
 
     def destroy(self, request, pk):
         product = get_object_or_404(

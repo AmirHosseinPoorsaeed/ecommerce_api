@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # third party
     'rest_framework',
     'debug_toolbar',
+    'django_filters',
 
     # local
     'core.apps.CoreConfig',
