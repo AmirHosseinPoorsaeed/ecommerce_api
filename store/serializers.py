@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from .models import Comment, Product, Category
+from .models import Cart, CartItem, Comment, Product, Category
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -72,4 +72,38 @@ class CommentSerializer(serializers.ModelSerializer):
             product_id=product_id,
             author_id=user_id,
             **validated_data
+        )
+
+
+class CartItemProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price', ]
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = CartItemProductSerializer()
+    item_total = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', 'item_total', ]
+
+    def get_item_total(self, cart_item):
+        return cart_item.quantity * cart_item.product.unit_price
+
+
+class CartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'items', 'datetime_created', 'total_price', ]
+        read_only_fields = ['id', ]
+
+    def get_total_price(self, cart):
+        return sum(
+            item.quantity * item.product.unit_price 
+            for item in cart.items.all()
         )

@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Prefetch
 
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
 
-from .models import Category, Comment, Product
-from .serializers import CategorySerializer, CommentSerializer, ProductSerializer
+from .models import Cart, CartItem, Category, Comment, Product
+from .serializers import CartSerializer, CategorySerializer, CommentSerializer, ProductSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -56,3 +58,16 @@ class CommentViewSet(ModelViewSet):
             'product_pk': self.kwargs['product_pk'],
             'user_pk': self.request.user.id
         }
+
+
+class CartViewSet(CreateModelMixin,
+                  RetrieveModelMixin,
+                  DestroyModelMixin,
+                  GenericViewSet):
+    queryset = Cart.objects.prefetch_related(
+        Prefetch(
+            'items',
+            queryset=CartItem.objects.select_related('product').all()
+        )
+    ).all()
+    serializer_class = CartSerializer
