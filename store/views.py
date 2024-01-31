@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
 
+from .paginations import CustomPagination
 from .models import Cart, CartItem, Category, Comment, Order, OrderItem, Product
 from .serializers import \
     AddCartItemSerializer, \
@@ -26,6 +27,7 @@ class ProductViewSet(ModelViewSet):
         'comments'
     ).select_related('category').all()
     serializer_class = ProductSerializer
+    pagination_class = CustomPagination
 
     def destroy(self, request, pk):
         product = get_object_or_404(
