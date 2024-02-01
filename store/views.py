@@ -7,11 +7,13 @@ from rest_framework import status
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .filters import ProductFilter
 from .paginations import CustomPagination
+from .permissions import IsAdminOrReadOnly
 from .models import \
     Cart, \
     CartItem, \
@@ -46,6 +48,7 @@ class ProductViewSet(ModelViewSet):
     filterset_class = ProductFilter
     search_fields = ['title', 'category__title', ]
     ordering_fields = ['unit_price', 'inventory', ]
+    permission_classes = [IsAdminOrReadOnly]
 
     def destroy(self, request, pk):
         product = get_object_or_404(
@@ -63,6 +66,7 @@ class ProductViewSet(ModelViewSet):
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.prefetch_related('products').all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def destroy(self, request, pk):
         category = get_object_or_404(
@@ -79,6 +83,7 @@ class CategoryViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         product_id = self.kwargs['product_pk']
