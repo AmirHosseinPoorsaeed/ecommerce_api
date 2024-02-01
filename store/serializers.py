@@ -3,7 +3,15 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from .models import Cart, CartItem, Comment, Customer, Order, OrderItem, Product, Category
+from .models import \
+    Cart, \
+    CartItem, \
+    Comment, \
+    Customer, \
+    Order, \
+    OrderItem, \
+    Product, \
+    Category
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -37,7 +45,8 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'title', 'slug', 'description', 'price',
-                  'price_aftre_tax', 'category', 'inventory', 'number_of_comments', ]
+                  'price_aftre_tax', 'category', 'inventory', 
+                  'number_of_comments', ]
         read_only_fields = ['slug', ]
 
     def get_price_aftre_tax(self, product):
@@ -153,8 +162,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderCustomerSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(
-        max_length=255, source='user.first_name')
-    last_name = serializers.CharField(max_length=255, source='user.last_name')
+        max_length=255, source='user.first_name'
+    )
+    last_name = serializers.CharField(
+        max_length=255, source='user.last_name'
+    )
     email = serializers.EmailField(source='user.email')
 
     class Meta:
@@ -168,7 +180,8 @@ class OrderForAdminSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'status', 'datetime_created', 'items', ]
+        fields = ['id', 'customer', 'status', 'datetime_created', 
+                  'items', ]
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -224,3 +237,18 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['status', ]
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id')
+    first_name = serializers.CharField(
+        max_length=255, source='user.first_name'
+    )
+    last_name = serializers.CharField(
+        max_length=255, source='user.last_name'
+    )
+
+    class Meta:
+        model = Customer
+        fields = ['id', 'user_id', 'first_name',
+                  'last_name', 'phone_number', 'birth_date']
