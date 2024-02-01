@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from environs import Env
 import mimetypes
+from datetime import timedelta
 
 env = Env()
 env.read_env()
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'debug_toolbar',
     'django_filters',
+    'djoser',
 
     # local
     'core.apps.CoreConfig',
@@ -157,4 +159,32 @@ DEBUG_TOOLBAR_CONFIG = {
 # Rest framework settings
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
+
+# JWT settings
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
+   'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+# Djoser settinggs
+DJOSER = {
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'auth/users/activation/{uid}/{token}',
+    'SERIALIZERS': {
+        'user_create': 'core.serializers.UserCreateSerializer',
+        'user': 'core.serializers.UserSerializer',
+    }
+}
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Authentication settings
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'core.authentication.EmailAuthBackend',
+]
