@@ -73,7 +73,7 @@ class Comment(models.Model):
         Product, on_delete=models.CASCADE, related_name='comments'
     )
     author = models.ForeignKey(
-        Customer, on_delete=models.CASCADE, related_name='comments'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments'
     )
     body = models.TextField()
     datetime_created = models.DateTimeField(auto_now_add=True)
