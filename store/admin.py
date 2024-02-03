@@ -1,10 +1,15 @@
 from django.contrib import admin
 
-from .models import Cart, CartItem, Order, OrderItem, Product, Comment, Category, Customer
+from .models import Cart, CartItem, Order, OrderItem, Product, Comment, Category, Customer, ProductImage
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
     pass
 
 

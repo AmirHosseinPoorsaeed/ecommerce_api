@@ -22,7 +22,8 @@ from .models import \
     Customer, \
     Order, \
     OrderItem, \
-    Product
+    Product, \
+    ProductImage
 from .serializers import \
     AddCartItemSerializer, \
     CartItemSerializer, \
@@ -33,6 +34,7 @@ from .serializers import \
     OrderCreateSerializer, \
     OrderForAdminSerializer, \
     OrderSerializer, \
+    ProductImageSerializer, \
     ProductSerializer, \
     UpdateCartItemSerializer, \
     UpdateOrderSerializer
@@ -61,6 +63,19 @@ class ProductViewSet(ModelViewSet):
             )
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    
+    def get_queryset(self):
+        product_id = self.kwargs['product_pk']
+        return ProductImage.objects.filter(product_id=product_id)
+    
+    def get_serializer_context(self):
+        return {'product_pk': self.kwargs['product_pk']}
+    
 
 
 class CategoryViewSet(ModelViewSet):

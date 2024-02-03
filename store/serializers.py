@@ -11,7 +11,8 @@ from .models import \
     Order, \
     OrderItem, \
     Product, \
-    Category
+    Category, \
+    ProductImage
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -29,6 +30,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def get_number_of_products(self, category):
         return category.products.count()
+    
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image', ]
+
+    def create(self, validated_data):
+        product_id = self.context['product_pk']
+        return ProductImage.objects.create(product_id=product_id, **validated_data)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -40,12 +51,13 @@ class ProductSerializer(serializers.ModelSerializer):
         view_name='category-detail',
         queryset=Category.objects.all()
     )
+    images = ProductImageSerializer(many=True, read_only=True)
     number_of_comments = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'title', 'slug', 'description', 'price',
-                  'price_aftre_tax', 'category', 'inventory', 
+                  'price_aftre_tax', 'category', 'inventory', 'images',
                   'number_of_comments', ]
         read_only_fields = ['slug', ]
 
@@ -251,4 +263,4 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = ['id', 'user_id', 'first_name',
-                  'last_name', 'phone_number', 'birth_date']
+                  'last_name', 'phone_number', 'birth_date', ]
