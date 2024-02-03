@@ -42,7 +42,8 @@ from .serializers import \
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related(
-        'comments'
+        'comments',
+        'images'
     ).select_related('category').all()
     serializer_class = ProductSerializer
     pagination_class = CustomPagination
