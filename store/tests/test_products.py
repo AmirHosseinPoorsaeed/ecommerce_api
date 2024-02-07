@@ -141,7 +141,7 @@ class TestDeleteProduct:
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_if_user_is_admin_returns_200(self, delete_product, authenticate, product_baker):
+    def test_if_user_is_admin_returns_204(self, delete_product, authenticate, product_baker):
         product = product_baker
         authenticate(is_staff=True)
 

@@ -114,7 +114,7 @@ class TestDeleteCategory:
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_if_user_is_admin_returns_200(self, delete_category, authenticate, category_baker):
+    def test_if_user_is_admin_returns_204(self, delete_category, authenticate, category_baker):
         category = category_baker
         authenticate(is_staff=True)
 
