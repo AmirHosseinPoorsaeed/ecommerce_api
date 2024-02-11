@@ -146,4 +146,11 @@ class TestDeleteOrder:
         response = delete_order(order_item.order.id)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
+    
+    def test_if_user_is_admin_and_order_has_order_item_returns_405(self, authenticate, order_item_baker, delete_order):
+        user = authenticate(is_staff=True)
+        order_item = order_item_baker(user)
 
+        response = delete_order(order_item.order.id)
+
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED

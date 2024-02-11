@@ -191,6 +191,19 @@ class OrderViewSet(ModelViewSet):
         serializer = OrderSerializer(order)
         return Response(serializer.data)
     
+    def destroy(self, request, pk):
+        order = get_object_or_404(
+            Order,
+            pk=pk
+        )
+        if order.items.count() > 0:
+            return Response({
+                'error': 'The order has some order items'}, 
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        order.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()

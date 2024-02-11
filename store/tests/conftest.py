@@ -109,7 +109,7 @@ def update_order(api_client):
 @pytest.fixture
 def delete_order(api_client):
     def do_delete_order(order_id):
-        return api_client.patch(reverse('order-detail', args=[order_id]))
+        return api_client.delete(reverse('order-detail', args=[order_id]))
     return do_delete_order
 
 
