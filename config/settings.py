@@ -181,14 +181,21 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create': 'core.serializers.UserCreateSerializer',
         'user': 'core.serializers.UserSerializer',
+    },
+    'EMAIL': {
+        'activation': 'core.emails.CustomActivationEmail',
     }
 }
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST_USER = 'localhost:8000'
 
 # Authentication settings
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'core.authentication.EmailAuthBackend',
 ]
+
+# Redis settings
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
