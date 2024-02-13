@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django_filters',
     'djoser',
+    'drf_spectacular',
 
     # local
     'core.apps.CoreConfig',
@@ -165,7 +166,8 @@ REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # JWT settings
@@ -199,3 +201,12 @@ AUTHENTICATION_BACKENDS = [
 
 # Redis settings
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
+
+# Spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
