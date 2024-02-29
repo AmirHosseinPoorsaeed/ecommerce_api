@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from uuid import uuid4
+from decimal import Decimal
 
 
 class Category(models.Model):
@@ -125,8 +126,16 @@ class Order(models.Model):
         max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS_UNPAID
     )
 
+    zarinpal_authority = models.CharField(max_length=255, blank=True)
+    zarinpal_ref_id = models.CharField(max_length=255, blank=True)
+    zarinpal_data = models.TextField(blank=True)
+
     def __str__(self):
         return f'Order id = {self.id}'
+    
+    @property
+    def total_price(self):
+        return sum(item.unit_price * item.quantity for item in self.items.all())
 
 
 class OrderItem(models.Model):

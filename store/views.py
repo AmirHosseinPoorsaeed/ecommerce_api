@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, I
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from .payment import payment_process, payment_callback
 from .filters import ProductFilter
 from .paginations import CustomPagination
 from .permissions import IsAdminOrReadOnly
@@ -64,19 +65,18 @@ class ProductViewSet(ModelViewSet):
             )
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 
 class ProductImageViewSet(ModelViewSet):
     serializer_class = ProductImageSerializer
     permission_classes = [IsAdminOrReadOnly]
-    
+
     def get_queryset(self):
         product_id = self.kwargs['product_pk']
         return ProductImage.objects.filter(product_id=product_id)
-    
+
     def get_serializer_context(self):
         return {'product_pk': self.kwargs['product_pk']}
-    
 
 
 class CategoryViewSet(ModelViewSet):
@@ -190,7 +190,7 @@ class OrderViewSet(ModelViewSet):
         order = create_order_serializer.save()
         serializer = OrderSerializer(order)
         return Response(serializer.data)
-    
+
     def destroy(self, request, pk):
         order = get_object_or_404(
             Order,
@@ -198,12 +198,21 @@ class OrderViewSet(ModelViewSet):
         )
         if order.items.count() > 0:
             return Response({
-                'error': 'The order has some order items'}, 
+                'error': 'The order has some order items'},
                 status=status.HTTP_405_METHOD_NOT_ALLOWED
             )
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
+    def payment(self, request, pk):
+        order = self.get_object()
+        return payment_process(request, order)
     
+    @action(detail=False, methods=['POST'], permission_classes=[IsAuthenticated])
+    def callback(self, request):
+        return payment_callback(request)
+
 
 class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
